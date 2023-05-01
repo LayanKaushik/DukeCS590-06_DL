@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# course related files
+
+COMPSCI 590.06 HW #4_ Deep RL.pdf
