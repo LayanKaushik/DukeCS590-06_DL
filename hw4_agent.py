@@ -62,6 +62,44 @@ class PolicyNetwork(nn.Module):
         action = logits.argmax(-1).squeeze().item()
         return action, prev_state
 
+# +
+# class PolicyNetwork(nn.Module):
+#     def _init_(self, naction, args):
+#         super()._init_()
+#         self.iH, self.iW, self.iC = 210, 160, 3
+#         self.conv1 = nn.Conv2d(1, 32, kernel_size=8, stride=4)
+#         #self.conv1 = nn.Conv2d(3, 32, kernel_size=8, stride=4)
+#         self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=3)
+#         self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1)
+#         # the flattened size is 8960 assuming new dims and convs above
+#         self.fc1 = nn.Linear(8960, args.hidden_dim)
+#         self.fc2 = nn.Linear(args.hidden_dim, naction)
+
+        
+#     def forward(self, X, prev_state=None):
+#         """
+#         X - bsz x T x iC x iH x iW observations (in order)
+#         returns:
+#           bsz x T x naction action logits, prev_state
+#         """
+#         bsz, T = X.size()[:2]
+       
+#         Z = F.gelu(self.conv3( # bsz*T x hidden_dim x H3 x W3
+#               F.gelu(self.conv2(
+#                 #F.gelu(self.conv1(X_blackandwhite.view(-1, 1, self.iH, self.iW)))))))
+#                 F.gelu(self.conv1(X.view(-1, 1, self.iH, self.iW)))))))
+        
+#     def get_action(self, x, prev_state):
+#         """
+#         x - 1 x 1 x ic x iH x iW
+#         returns:
+#           int index of action
+#         """
+#         logits, prev_state = self(x, prev_state)
+#         # take highest scoring action
+#         action = logits.argmax(-1).squeeze().item()
+#         return action, prev_state
+# -
 
 def pg_step(stepidx, model, optimizer, scheduler, envs, observations, prev_state, bsz=4):
     if envs is None:
@@ -175,7 +213,7 @@ def train(args):
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--env", type=str, default="ALE/MsPacman-v5", help="gym environment")
-parser.add_argument("--mode", default="train", choices=["train", "valid",], 
+parser.add_argument("--mode", default="train", choices=["train", "valid"], 
                     help="training or validation mode")
 parser.add_argument("--total_frames", default=1000000, type=int, 
                     help="total environment frames to train for")

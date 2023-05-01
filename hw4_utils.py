@@ -24,6 +24,19 @@ def preprocess_observation(obs):
     return torch.from_numpy(obs).permute(2, 0, 1)/255.0
 
 
+# +
+# def preprocess_observation(obs):
+#     """
+#     obs - a 210 x 160 x 3 ndarray representing an atari frame
+#     returns:
+#       a 3 x 210 x 160 normalized pytorch tensor
+#     """
+
+#     blackandwhite = np.mean(obs, axis=2) 
+#     #return torch.from_numpy(blackandwhite).permute(2, 0, 1)/255.0
+#     return torch.from_numpy(blackandwhite).unsqueeze(0).float() / 255.0
+# -
+
 def validate(model, render=False, nepisodes=1):
     assert hasattr(model, "get_action")
     torch.manual_seed(590060)
