@@ -131,3 +131,4 @@ dmypy.json
 # course related files
 
 COMPSCI_HW4_Deep RL.pdf
+*.pt
