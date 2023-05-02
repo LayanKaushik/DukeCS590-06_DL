@@ -2,7 +2,6 @@ import logging
 import torch
 import numpy as np
 import gymnasium as gym
-import cv2
 
 logging.basicConfig(format=(
         "[%(levelname)s:%(asctime)s] " "%(message)s"), level=logging.INFO)
@@ -14,28 +13,25 @@ except:
     logging.warning("Cannot import matplotlib; will not attempt to render")
     can_render = False
 
-
-def preprocess_observation(obs):
-    """
-    obs - a 210 x 160 x 3 ndarray representing an atari frame
-    returns:
-      a 3 x 210 x 160 normalized pytorch tensor
-    """
-    return torch.from_numpy(obs).permute(2, 0, 1)/255.0
-
-
-# +
 # def preprocess_observation(obs):
 #     """
 #     obs - a 210 x 160 x 3 ndarray representing an atari frame
 #     returns:
 #       a 3 x 210 x 160 normalized pytorch tensor
 #     """
+#     return torch.from_numpy(obs).permute(2, 0, 1)/255.0
 
-#     blackandwhite = np.mean(obs, axis=2) 
-#     #return torch.from_numpy(blackandwhite).permute(2, 0, 1)/255.0
-#     return torch.from_numpy(blackandwhite).unsqueeze(0).float() / 255.0
-# -
+def preprocess_observation(obs):
+    """
+    obs - a 210 x 160 x 3 ndarray representing an atari frame
+    returns:
+      a 1 x 85 x 80 normalized pytorch tensor
+    """
+    obs_gray =  np.mean(obs, axis=2) 
+    obs_gray_cropped = obs_gray[1:-40, :] 
+    obs_downsample = obs_gray_cropped[::2, ::2]
+
+    return torch.from_numpy(obs_downsample).unsqueeze(0).float() / 255.0
 
 def validate(model, render=False, nepisodes=1):
     assert hasattr(model, "get_action")
