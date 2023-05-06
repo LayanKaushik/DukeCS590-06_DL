@@ -2,9 +2,6 @@ import logging
 import torch
 import numpy as np
 import gymnasium as gym
-import random
-from collections import deque
-import cv2
 
 logging.basicConfig(format=(
         "[%(levelname)s:%(asctime)s] " "%(message)s"), level=logging.INFO)
@@ -17,49 +14,29 @@ except:
     can_render = False
 
 
-
-
-class ReplayBuffer:
-    def __init__(self, buffer_size, device):
-        self.buffer_size = buffer_size
-        self.buffer = deque(maxlen=buffer_size)
-        self.device = device
-
-    def add(self, state, action, reward, next_state):
-        self.buffer.append((state, action, reward, next_state))
-
-    def sample(self, batch_size):
-        batch = random.sample(self.buffer, batch_size)
-        states, actions, rewards, next_states = zip(*batch)
-        return (
-            torch.tensor(states, dtype=torch.float32, device=self.device),
-            torch.tensor(actions, dtype=torch.int64, device=self.device),
-            torch.tensor(rewards, dtype=torch.float32, device=self.device),
-            torch.tensor(next_states, dtype=torch.float32, device=self.device),
-        )
-
-    def __len__(self):
-        return len(self.buffer)
-
-
-
-
 def preprocess_observation(obs):
     """
     obs - a 210 x 160 x 3 ndarray representing an atari frame
     returns:
       a 1 x 85 x 80 normalized pytorch tensor
     """
-    obs_gray = obs.mean(axis=2)  # Convert to grayscale by taking the mean across color channels
-    obs_gray_cropped = obs_gray[1:-40, :]
-    obs_downsample = obs_gray_cropped[::2, ::2]
-    return torch.from_numpy(obs_downsample).permute(1,0).unsqueeze(0)/255.0
+    #cropping out the lives and black screen at the bottom to simplify
+    obs_cropped = obs[1:-40, :]
+
+    #downsampling the current observation by factor of 2
+    obs_downsample = obs_cropped[::2, ::2]
+
+    # Converting to grayscale by taking the mean across color channel
+
+    obs_gray = np.mean(obs_downsample, axis=2)
+    z = torch.from_numpy(obs_gray).unsqueeze(0).float() / 255.0
+    return torch.from_numpy(obs_gray).unsqueeze(0).float() / 255.0
 
 
 def validate(model, render=False, nepisodes=1):
     assert hasattr(model, "get_action")
-    torch.manual_seed(590060)
-    np.random.seed(590060)
+    torch.manual_seed(1729)
+    np.random.seed(1729)
     model.eval()
 
     render = render and can_render
@@ -72,7 +49,7 @@ def validate(model, render=False, nepisodes=1):
     steps_alive = []
     for i in range(nepisodes):
         env = gym.make("ALE/MsPacman-v5")
-        obs = env.reset(seed=590060+i)[0]
+        obs = env.reset(seed=1729+i)[0]
         if render:
             im = ax.imshow(obs)
         observation = preprocess_observation( # 1 x 1 x ic x iH x iW
