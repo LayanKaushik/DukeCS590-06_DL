@@ -1,6 +1,6 @@
 # DukeCS590-06_DL
 
-#Advantage Actor-Critic to play the Ms. Pacman Atari game
+#Deep Q-Learning and Advantage Actor-Critic to play the Ms. Pacman Atari game Trials
 
 #References:
 
