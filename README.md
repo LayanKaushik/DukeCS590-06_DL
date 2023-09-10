@@ -1,5 +1,7 @@
 # DukeCS590-06_DL
 
+Acknowledgment: This content has been created as part of the Duke 590 Deep Learning Class.
+
 ## Advantage Actor-Critic (A2C) to play the Ms. Pacman Atari game
 
 # Improvements and Modifications
